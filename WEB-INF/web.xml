@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="3.1">
+    
+    <servlet>
+        <servlet-name>ServletRegistro</servlet-name>
+        <servlet-class>ServletRegistro</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ServletRegistro</servlet-name>
+        <url-pattern>/registrar</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ServletLogin</servlet-name>
+        <servlet-class>ServletLogin</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>ServletLogin</servlet-name>
+        <url-pattern>/entrar</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ServletLogout</servlet-name>
+        <servlet-class>ServletLogout</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ServletLogout</servlet-name>
+        <url-pattern>/salir</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ServletLobby</servlet-name>
+        <servlet-class>ServletLobby</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ServletLobby</servlet-name>
+        <url-pattern>/lobby</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ServletCrearPartida</servlet-name>
+        <servlet-class>ServletCrearPartida</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ServletCrearPartida</servlet-name>
+        <url-pattern>/crearPartida</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+    <servlet-name>ServletTablero</servlet-name>
+    <servlet-class>ServletTablero</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ServletTablero</servlet-name>
+        <url-pattern>/jugar</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ServletProcesarPartida</servlet-name>
+        <servlet-class>ServletProcesarPartida</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ServletProcesarPartida</servlet-name>
+        <url-pattern>/procesarPartida</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ServletUnirsePartida</servlet-name>
+        <servlet-class>ServletUnirsePartida</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ServletUnirsePartida</servlet-name>
+        <url-pattern>/unirsePartida</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ServletBorrarPartida</servlet-name>
+        <servlet-class>ServletBorrarPartida</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>ServletBorrarPartida</servlet-name>
+        <url-pattern>/borrarPartida</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+</web-app>

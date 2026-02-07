@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de la Oca - Iniciar Sesión</title>
+        <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+    <div class="contenedor icon-dados">
+        <h1>¡Hola de nuevo!</h1>
+        <p class="info">Introduce tus credenciales de ganso para volver al tablero.</p>
+        
+        <form action="entrar" method="POST">
+            <div class="form-group">
+                <label>Tu Nick:</label>
+                <input type="text" name="usuario" placeholder="Ej: SuperOca88" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Contraseña:</label>
+                <input type="password" name="clave" placeholder="••••••••" required>
+            </div>
+            
+            <button type="submit">¡ENTRAR A JUGAR!</button>
+        </form>
+
+        <div class="footer-link">
+            ¿Eres nuevo por aquí? <a href="index.html">Regístrate gratis</a>
+        </div>
+    </div>
+
+    <div class="footer-credits">
+        Desarrollado por:<br>
+        Paula Miguens • Marcos Ibáñez • Jaume Bravo
+    </div>
+
+</body>
+</html>

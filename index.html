@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de la Oca - ¡Únete a la Carrera!</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+    <div class="contenedor icon-oca">
+        <h1>¡De Oca a Oca!</h1>
+        <p class="info">Crea tu ganso y prepárate para tirar los dados. <br> ¡La gran carrera te espera!</p>
+        
+        <form action="registrar" method="POST">
+            <div class="form-group">
+                <label>Tu nombre de ganso (Nick):</label>
+                <input type="text" name="usuario" placeholder="Ej: SuperOca88" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Contraseña:</label>
+                <input type="password" name="clave" placeholder="••••••••" required>
+            </div>
+            
+            <button type="submit">¡EMPEZAR AVENTURA!</button>
+        </form>
+
+        <div class="footer-link">
+            ¿Ya eres un veterano? <a href="login.html">Entra aquí</a>
+        </div>
+    </div>
+
+    <div class="footer-credits">
+        Desarrollado por:<br>
+        Paula Miguens • Marcos Ibáñez • Jaume Bravo
+    </div>
+
+</body>
+</html>
