@@ -1,4 +1,4 @@
-FROM tomcat:9.0-jdk11-openjdk
+FROM tomcat:9.0-jdk17-openjdk-slim
 # Copiamos todo el contenido de tu carpeta 'oca' a la raíz del servidor
 COPY . /usr/local/tomcat/webapps/ROOT
 EXPOSE 8080
