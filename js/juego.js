@@ -1,5 +1,5 @@
 let intervaloJuego;
-let intervaloVisualDado; // NUEVO: Para el giro continuo
+let intervaloVisualDado; 
 let globalRotX = 0; 
 let globalRotY = 0;
 let posicionesLocales = {}; 
@@ -25,13 +25,20 @@ function cargarEstado() {
                     data.jugadores.forEach(j => posicionesLocales[j.idUsuario] = j.casilla);
                 }
                 
+                // --- DETECTAR SI LA PARTIDA YA ACABÓ (Para el perdedor) ---
+                if (data.ganador && data.ganador !== "") {
+                     mostrarVictoria(data.ganador);
+                     actualizarInterfaz(data); // Para bloquear botones
+                     return;
+                }
+
                 let hayMovimiento = false;
                 data.jugadores.forEach(j => {
                     let posAnt = posicionesLocales[j.idUsuario];
                     if (posAnt !== undefined && posAnt !== j.casilla) hayMovimiento = true;
                 });
 
-                // Si detectamos movimiento (ajeno), usamos la gestión completa
+                // Si detectamos movimiento, usamos la gestión completa
                 if (hayMovimiento) gestionarRespuestaTirada(data);
                 else {
                     actualizarTablero(data);
@@ -42,20 +49,25 @@ function cargarEstado() {
         .catch(err => console.log("Esperando...", err));
 }
 
-// --- NUEVA LÓGICA DE DADO FLUIDO ---
+// --- LÓGICA DE DADO ---
 
 function tirarDado(targetId) {
     if (animando) return;
     animando = true; 
     
-    // 1. Feedback visual inmediato en la interfaz
+    // 1. Decidimos el número AQUÍ (instantáneo)
+    let resultadoLocal = Math.floor(Math.random() * 6) + 1;
+
+    // 2. Feedback visual y giro
     if(ultimoEstado) actualizarInterfaz(ultimoEstado);
-
-    // 2. ¡Giro frenético YA! (Sin esperar al servidor)
     iniciarGiroFrenetico();
+    
+    setTimeout(() => {
+        animarDado(resultadoLocal);
+    }, 500);
 
-    // 3. Petición al servidor
-    fetch('jugar?modo=datos&action=tirar&t=' + Date.now() + '&targetId=' + targetId)
+    // 3. Enviamos el resultado al servidor
+    fetch('jugar?modo=datos&action=tirar&t=' + Date.now() + '&targetId=' + targetId + '&dadoManual=' + resultadoLocal)
         .then(r => r.json())
         .then(data => gestionarRespuestaTirada(data));
 }
@@ -66,6 +78,10 @@ function tirarDadoManual(targetId, valor) {
     if(ultimoEstado) actualizarInterfaz(ultimoEstado);
 
     iniciarGiroFrenetico();
+    
+    setTimeout(() => {
+        animarDado(valor);
+    }, 500);
 
     fetch('jugar?modo=datos&action=tirar&t=' + Date.now() + '&targetId=' + targetId + '&dadoManual=' + valor)
         .then(r => r.json())
@@ -76,44 +92,31 @@ function iniciarGiroFrenetico() {
     let dado = document.getElementById('dado');
     if (!dado) return;
 
-    // Quitamos la transición suave para que los cambios sean instantáneos (efecto borroso/rápido)
     dado.style.transition = 'none';
-
-    // Bucle que gira el dado aleatoriamente cada 50ms
     if (intervaloVisualDado) clearInterval(intervaloVisualDado);
     intervaloVisualDado = setInterval(() => {
-        globalRotX += 40 + Math.random() * 20; // Giro rápido constante
+        globalRotX += 40 + Math.random() * 20; 
         globalRotY += 40 + Math.random() * 20;
         dado.style.transform = `rotateX(${globalRotX}deg) rotateY(${globalRotY}deg)`;
     }, 50);
 }
 
 function animarDado(resultado) {
-    // 1. DETENER el giro frenético
     clearInterval(intervaloVisualDado);
-
     let dado = document.getElementById('dado');
     if (dado) {
-        // 2. REACTIVAR transición suave para el aterrizaje
-        dado.style.transition = 'transform 1s cubic-bezier(0.15, 0.9, 0.34, 1)'; // Efecto rebote suave al final
-
-        // 3. CALCULAR DESTINO FINAL
+        dado.style.transition = 'transform 0.5s cubic-bezier(0.15, 0.9, 0.34, 1)'; 
         const coords = { 1:[0,0], 2:[0,180], 3:[0,-90], 4:[0,90], 5:[-90,0], 6:[90,0] };
         
-        // Redondeamos los ángulos actuales a múltiplos de 360 para evitar giros raros
-        // y sumamos un par de vueltas extra (720) para que el frenado tenga recorrido.
         let baseRotX = Math.ceil(globalRotX / 360) * 360 + 720;
         let baseRotY = Math.ceil(globalRotY / 360) * 360 + 720;
 
         let rotXFinal = baseRotX + coords[resultado][0];
         let rotYFinal = baseRotY + coords[resultado][1];
         
-        // Actualizamos globales para el futuro
         globalRotX = rotXFinal;
         globalRotY = rotYFinal;
 
-        // 4. APLICAR
-        // Usamos requestAnimationFrame para asegurar que el navegador pilla el cambio de 'transition'
         requestAnimationFrame(() => {
             dado.style.transform = `rotateX(${rotXFinal}deg) rotateY(${rotYFinal}deg)`;
         });
@@ -140,8 +143,11 @@ function gestionarRespuestaTirada(data) {
     });
 
     if (jugadorMoviendose) {
-        // ATERRIZAR DADO
-        if (data.ultimoDado > 0) animarDado(data.ultimoDado);
+        if (data.ultimoDado > 0) {
+            if (jugadorMoviendose.idUsuario !== data.idUsuarioLogueado) {
+                animarDado(data.ultimoDado);
+            }
+        }
 
         let destinoIntermedio = (data.casillaIntermedia !== undefined && data.casillaIntermedia > -1) 
                                 ? data.casillaIntermedia 
@@ -149,7 +155,6 @@ function gestionarRespuestaTirada(data) {
 
         prepararEscenaAnimacion(origen, jugadorMoviendose, data);
 
-        // Esperamos 1.1s (1s de giro + margen) para mover la ficha
         setTimeout(() => {
             moverFichaActorPasoAPaso(jugadorMoviendose, origen, destinoIntermedio, data.ultimoDado, () => {
                 
@@ -161,17 +166,14 @@ function gestionarRespuestaTirada(data) {
                     finalizarAnimacion(data, jugadorMoviendose, destinoFinal);
                 }
             });
-        }, 1100); 
+        }, 600); 
     } else {
-        // Si no hay movimiento (ej. bloqueo), paramos el dado también
         if(intervaloVisualDado) {
             clearInterval(intervaloVisualDado);
-            // Dejarlo caer suavemente en cualquier cara (ej. la última) o forzar una visual
-            // Para simplificar, si no se mueve, no mostramos dado nuevo o mostramos el último conocido
             let dado = document.getElementById('dado');
             if(dado) {
                dado.style.transition = 'transform 0.5s ease';
-               let r = Math.ceil(globalRotX/90)*90; // Cuadrar
+               let r = Math.ceil(globalRotX/90)*90;
                dado.style.transform = `rotateX(${r}deg) rotateY(${Math.ceil(globalRotY/90)*90}deg)`;
             }
         }
@@ -179,6 +181,8 @@ function gestionarRespuestaTirada(data) {
         animando = false;
         actualizarTablero(data);
         actualizarInterfaz(data);
+        // Si al refrescar vemos que ya hay ganador (ej: reload tardío), mostramos
+        if (data.ganador && data.ganador !== "") mostrarVictoria(data.ganador);
     }
 }
 
@@ -215,13 +219,18 @@ function moverFichaActorPasoAPaso(jugador, inicio, objetivoVisual, dado, callbac
     let pasosDados = 0;
     let actual = inicio;
     let actor = document.getElementById('actor-movimiento');
+    let direccion = 1; // 1 = Adelante, -1 = Atrás
     
     if (!actor) { if(callback) callback(); return; }
     if (inicio === objetivoVisual) { if(callback) callback(); return; }
 
     let intervalo = setInterval(() => {
         pasosDados++;
-        if (actual < 63) actual++; else actual--; 
+        
+        // --- LOGICA REBOTE CORRECTA ---
+        if (actual === 63) direccion = -1; // Si tocas pared, rebotas
+        actual += direccion;
+        // ------------------------------
 
         let celdaDestino = document.getElementById('celda-' + actual);
         if (celdaDestino) {
@@ -250,7 +259,13 @@ function finalizarAnimacion(data, jugador, destino) {
     actualizarTablero(data);
     actualizarInterfaz(data);
     
-    if(destino === 63) mostrarVictoria(jugador.nick);
+    // Si alguien ganó, mostramos victoria para TODOS (el servidor manda data.ganador)
+    if (data.ganador && data.ganador !== "") {
+        mostrarVictoria(data.ganador);
+    } else if (destino === 63) {
+        // Fallback por si acaso
+        mostrarVictoria(jugador.nick);
+    }
 }
 
 function actualizarTablero(data) {
@@ -298,7 +313,8 @@ function actualizarInterfaz(data) {
     document.getElementById('col-der').innerHTML = '';
 
     data.jugadores.forEach((jugador, index) => {
-        let card = crearHTMLTarjeta(jugador, data.idUsuarioLogueado, data.esModoDev);
+        // Pasamos el dato del ganador para bloquear botones
+        let card = crearHTMLTarjeta(jugador, data.idUsuarioLogueado, data.esModoDev, data.ganador);
         if (index < 2) document.getElementById('col-izq').innerHTML += card;
         else document.getElementById('col-der').innerHTML += card;
     });
@@ -311,7 +327,7 @@ function mostrarNotificacion(msg) {
     setTimeout(() => { n.style.display = 'none'; }, 3000);
 }
 
-function crearHTMLTarjeta(jugador, miId, esModoDev) {
+function crearHTMLTarjeta(jugador, miId, esModoDev, ganador) {
     let esMiTurno = (jugador.turno === 1);
     let soyYo = (jugador.idUsuario === miId);
     let control = (soyYo || esModoDev);
@@ -321,6 +337,13 @@ function crearHTMLTarjeta(jugador, miId, esModoDev) {
         <div class="avatar-zoom-box"><img src="${jugador.imagen}" class="player-avatar"></div>
         <p class="player-name">${jugador.nick}</p>
         <p class="player-rank">Casilla: ${jugador.casilla}</p>`;
+
+    // --- SI HAY GANADOR, BLOQUEAMOS TODO ---
+    if (ganador && ganador !== "") {
+        html += `<div class="status-indicator badge-blocked" style="background:var(--dark); color:white;">🏆 GANÓ ${ganador}</div>`;
+        html += `</div>`;
+        return html;
+    }
 
     if (jugador.bloqueo > 0) {
         if (esMiTurno && control) {
