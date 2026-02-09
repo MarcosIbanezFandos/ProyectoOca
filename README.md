@@ -47,7 +47,7 @@ Este proyecto es una aplicación web completa desarrollada en **Java (Jakarta EE
 ## 🌐 Jugar en Línea
 
 A diferencia de un proyecto local, este juego está desplegado en la nube y es accesible desde cualquier parte del mundo:
-* **Enlace de acceso**: [¡Juega aquí ahora!](https://proyectoooca-production.up.railway.app)
+* **Enlace de acceso**: [¡Juega aquí ahora!](https://proyectooca-production.up.railway.app)
 * **Sin instalación**: No necesitas configurar Java ni Tomcat; solo entra con el link, regístrate y empieza la carrera.
 * **Multijugador sincronizado**: Comparte el link con tus amigos, cread una sala y veréis los movimientos de los demás en tiempo real gracias a la sincronización con AWS RDS.
 
