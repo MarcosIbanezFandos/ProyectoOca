@@ -44,20 +44,42 @@ Este proyecto es una aplicación web completa desarrollada en **Java (Jakarta EE
 
 ---
 
-## 🌐 Jugar en Línea
+## 🌐 Estado del despliegue
 
-A diferencia de un proyecto local, este juego está desplegado en la nube y es accesible desde cualquier parte del mundo:
-* **Enlace de acceso**: [¡Juega aquí ahora!](https://proyectooca-production.up.railway.app)
-* **Sin instalación**: No necesitas configurar Java ni Tomcat; solo entra con el link, regístrate y empieza la carrera.
-* **Multijugador sincronizado**: Comparte el link con tus amigos, cread una sala y veréis los movimientos de los demás en tiempo real gracias a la sincronización con AWS RDS.
+> ⛔ **El servicio en línea está actualmente CAÍDO.**
+> La URL `https://proyectooca-production.up.railway.app` devuelve
+> `404 – Application not found`: el servicio de **Railway ya no está en marcha**
+> (dado de baja / sin desplegar), muy probablemente para **evitar el consumo de
+> horas y el coste del plan de Railway y de la base de datos AWS RDS** por
+> desuso del proyecto.
+>
+> El código es plenamente funcional; puede volver a ejecutarse en local con
+> Docker (ver abajo) o redesplegarse en la nube. Para jugar online de nuevo
+> haría falta **(1)** relanzar el contenedor en Railway (u otro *host*) y
+> **(2)** disponer de una base de datos MySQL accesible (AWS RDS u otra),
+> configurando las credenciales de conexión JDBC.
 
 ---
 
 ## 🔧 Instalación Local rápida con Docker
 
-```
-bash
-git clone [https://github.com/MarcosIbanezFandos/ProyectoOca.git](https://github.com/MarcosIbanezFandos/ProyectoOca.git)
+```bash
+git clone https://github.com/MarcosIbanezFandos/ProyectoOca.git
 cd ProyectoOca
 docker build -t oca-game .
 docker run -p 8080:8080 oca-game
+```
+
+Luego abre `http://localhost:8080`.
+
+> ℹ️ Para el modo multijugador con persistencia necesitarás una base de datos
+> **MySQL** accesible y configurar las credenciales de conexión (host, usuario,
+> contraseña y nombre de la BD) que usan los *servlets* vía JDBC. Sin base de
+> datos, la aplicación arranca pero el registro/login y la sincronización de
+> partidas no funcionarán.
+
+---
+
+## 👤 Autor
+
+Marcos Ibáñez Fandos — [@MarcosIbanezFandos](https://github.com/MarcosIbanezFandos)
