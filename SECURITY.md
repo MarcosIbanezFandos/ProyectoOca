@@ -15,27 +15,35 @@ Stack: Servlets Java sobre Tomcat · MySQL en AWS RDS · frontend estático.
 **Ningún secreto en el código.** Ni en `.java`, ni en `web.xml`, ni en el README.
 
 Y muy importante en este proyecto: **tampoco en los `.class` compilados.** Un
-`.class` no es un binario opaco — las constantes de texto se leen con `strings` o
-con cualquier decompilador en dos segundos. Commitear `WEB-INF/classes/*.class`
-publica exactamente lo mismo que publicar el fuente.
+`.class` no es un binario opaco — las constantes de texto se leen en dos segundos:
+
+```bash
+javap -c -p WEB-INF/classes/Conexion.class   # muestra cada literal del código
+```
+
+Commitear un `.class` con una contraseña dentro publica exactamente lo mismo que
+commitear el fuente con la contraseña dentro.
+
+> **Nota sobre este repositorio:** hoy se versionan los `.class` de
+> `WEB-INF/classes/` porque son el artefacto que despliega el `Dockerfile` y los
+> fuentes `.java` nunca se subieron. Por eso **no** están en `.gitignore`:
+> borrarlos rompería el despliegue. La dirección correcta es subir los `.java`
+> (como ya se ha hecho con `src/Conexion.java`) y compilar dentro del Dockerfile;
+> a partir de ahí sí se podrán ignorar los compilados.
 
 La conexión a base de datos se lee del entorno, con fallo ruidoso si falta:
 
-```java
-public class Conexion {
-    private static final String URL  = System.getenv("DB_URL");
-    private static final String USER = System.getenv("DB_USER");
-    private static final String PASS = System.getenv("DB_PASSWORD");
+Es lo que hace ya `src/Conexion.java`:
 
-    public static Connection obtenerConexion() throws SQLException {
-        if (URL == null || USER == null || PASS == null) {
-            throw new IllegalStateException("Faltan DB_URL / DB_USER / DB_PASSWORD");
-        }
-        return DriverManager.getConnection(URL, USER, PASS);
-    }
-    // ❌ nunca:  private static final String PASS = "mipassword123";
-}
+```java
+private static final String URL  = System.getenv("DB_URL");
+private static final String USER = System.getenv("DB_USER");
+private static final String PASS = System.getenv("DB_PASSWORD");
+// ❌ nunca:  private static final String PASS = "mipassword123";
 ```
+
+El despliegue necesita `DB_URL`, `DB_USER` y `DB_PASSWORD` en el entorno. Sin
+ellas la aplicación arranca pero no conecta, y lo dice en el log.
 
 Reglas de base de datos:
 

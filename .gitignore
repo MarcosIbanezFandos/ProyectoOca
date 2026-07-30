@@ -1,0 +1,21 @@
+# Secretos — nunca en el repositorio
+.env
+.env.*
+*.properties
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+*.iml
+
+# Empaquetado
+*.war
+target/
+build/
+
+# OJO: WEB-INF/classes/*.class NO se ignora a propósito.
+# Son el artefacto que despliega el Dockerfile y los .java correspondientes
+# nunca se subieron al repositorio, así que ignorarlos rompería el despliegue.
+# Cuando estén todos los fuentes en src/ y el Dockerfile compile, añadir aquí:
+#   WEB-INF/classes/
